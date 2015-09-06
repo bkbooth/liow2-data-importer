@@ -1,15 +1,18 @@
-server:
-  build: importer
-  links:
-    - mysql
-    - mongo
-  volumes:
-    - .:/usr/src/app
+#server:
+#  build: importer
+#  links:
+#    - mysql
+#    - mongo
+#  volumes:
+#    - .:/usr/src/app
 
 mysql:
   build: mysql
   ports:
     - "3306:3306"
+  environment:
+    - MYSQL_ROOT_PASSWORD=mysql
+    - MYSQL_DATABASE=loviswpn
 
 mongo:
   image: mongo
