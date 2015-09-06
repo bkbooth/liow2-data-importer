@@ -1,0 +1,17 @@
+server:
+  build: importer
+  links:
+    - mysql
+    - mongo
+  volumes:
+    - .:/usr/src/app
+
+mysql:
+  build: mysql
+  ports:
+    - "3306:3306"
+
+mongo:
+  image: mongo
+  ports:
+    - "27017:27017"
