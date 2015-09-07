@@ -30,22 +30,30 @@ function processTransformations(mysql, mongodb) {
 
   // Run each transformer
   _.each(transformers, function __each(transformer) {
-    var data = transformer.dataIn(mysql);
-    if (_.isFunction(transformer.transform)) {
-      data = transformer.transform(data, mysql);
-    }
-    transformer.dataOut(data, mongodb);
-  });
+    transformer.dataIn(mysql, function __dataIn(err, data) {
+      if (err) { throw err; }
 
-  // Disconnect from MySQL
-  mysql.end(function __end(err) {
-    if (err) { throw new Error('Failed disconnecting from MySQL: ' + err.message) }
-    console.log('Disconnected from MySQL');
-  });
+      transformer.transform(data, mysql, function __transform(err, data) {
+        if (err) { throw err; }
 
-  // Disconnect from MongoDB
-  mongodb.close(function __close(err) {
-    if (err) { throw new Error('Failed disconnecting from MongoDB: ' + err.message) }
-    console.log('Disconnected from MongoDB');
+        transformer.dataOut(data, mongodb, function __dataOut(err, result) {
+          if (err) { throw err; }
+
+          console.log('Finished importing', result.insertedCount, transformer.name);
+
+          // Disconnect from MySQL
+          mysql.end(function __end(err) {
+            if (err) { throw new Error('Failed disconnecting from MySQL: ' + err.message) }
+            console.log('Disconnected from MySQL');
+          });
+
+          // Disconnect from MongoDB
+          mongodb.close(function __close(err) {
+            if (err) { throw new Error('Failed disconnecting from MongoDB: ' + err.message) }
+            console.log('Disconnected from MongoDB');
+          });
+        });
+      });
+    });
   });
 }
