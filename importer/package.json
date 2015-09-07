@@ -1,0 +1,17 @@
+{
+  "name": "liow2-importer",
+  "version": "1.0.0",
+  "description": "Import MySQL data, transform and export to Mongo",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "mocha"
+  },
+  "author": "Ben Booth <bkbooth@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "lodash": "^3.10.1",
+    "mongodb": "^2.0.42",
+    "mysql": "^2.9.0"
+  }
+}
