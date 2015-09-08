@@ -10,7 +10,7 @@ module.exports = {
   },
 
   // Pass straight into MongoClient.connect()
-  mongo: 'mongodb://localhost:27017/database',
+  mongodb: 'mongodb://localhost:27017/database',
 
   // Names of modules inside ./transformers directory
   // Must export dataIn, transform and dataOut functions
