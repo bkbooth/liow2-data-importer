@@ -7,10 +7,13 @@ module.exports = {
   name: name,
 
   dataIn: function __dataIn(mysql, done) {
-    var query = 'SELECT u.email, u.name, u.group_id as admin, u.created, ' +
-      'IF(u.activated = 1, TRUE, FALSE) AS activated, c.code as country ' +
+    var query = 'SELECT DISTINCT u.email, u.name, u.created, c.code as country, ' +
+      'IF(u.group_id = 1, TRUE, FALSE) AS admin, ' +
+      'IF(u.activated = 1, TRUE, FALSE) AS activated ' +
       'FROM `users` AS u ' +
+      'RIGHT JOIN `testimonies` AS t ON t.user_id = u.id ' +
       'LEFT JOIN `countries` AS c ON u.country_id = c.id ' +
+      'WHERE activated = TRUE ' +
       'ORDER BY u.id';
 
     mysql.query(query, function __query(err, users) {
@@ -21,28 +24,21 @@ module.exports = {
   },
 
   transform: function __transform(users, mysql, mongodb, done) {
-    async.parallel([
+    async.waterfall([
       function(done) {
         mongodb.collection('countries').find({}).toArray(done);
       },
-      function(done) {
-        async.filter(users, function __filter(user, done) {
-          done(user.activated);
-        }, _.partial(done, null));
+      function (countries, done) {
+        async.map(users, function(user, done) {
+          user.username = user.name;
+          user.admin = Boolean(user.admin);
+          user.activated = Boolean(user.activated);
+          user.country = _.find(countries, 'code', user.country.toUpperCase())._id;
+
+          done(null, user);
+        }, done);
       }
-    ], function __done(err, results) {
-      var countries = results[0];
-      var users = results[1];
-
-      async.map(users, function(user, done) {
-        user.username = user.name;
-        user.admin = user.admin === 1;
-        user.activated = Boolean(user.activated);
-        user.country = _.find(countries, 'code', user.country.toUpperCase())._id;
-
-        done(null, user);
-      }, done);
-    });
+    ], done);
   },
 
   dataOut: function __dataOut(users, mongodb, done) {
