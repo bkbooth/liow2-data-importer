@@ -58,7 +58,7 @@ function processTransformations(mysql, mongodb, done) {
         transformer.dataIn(mysql, done);
       },
       function(data, done) {
-        transformer.transform(data, mysql, done);
+        transformer.transform(data, mysql, mongodb, done);
       },
       function(data, done) {
         transformer.dataOut(data, mongodb, done);
