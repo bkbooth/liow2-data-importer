@@ -7,13 +7,14 @@ module.exports = {
   name: name,
 
   dataIn: function __dataIn(mysql, done) {
-    var query = 'SELECT DISTINCT u.email, u.name, u.created, c.code as country, ' +
+    var query = 'SELECT DISTINCT u.email, u.name, u.created, c.code as country, m.name as groups, ' +
       'IF(u.group_id = 1, TRUE, FALSE) AS admin, ' +
       'IF(u.activated = 1, TRUE, FALSE) AS activated ' +
       'FROM `users` AS u ' +
       'RIGHT JOIN `testimonies` AS t ON t.user_id = u.id ' +
       'LEFT JOIN `countries` AS c ON u.country_id = c.id ' +
-      'WHERE activated = TRUE ' +
+      'LEFT JOIN `ministries` AS m ON u.ministry_id = m.id ' +
+      'WHERE u.activated = TRUE ' +
       'ORDER BY u.id';
 
     mysql.query(query, function __query(err, users) {
@@ -34,6 +35,7 @@ module.exports = {
           user.admin = Boolean(user.admin);
           user.activated = Boolean(user.activated);
           user.country = _.find(countries, 'code', user.country.toUpperCase())._id;
+          user.groups = [user.groups];
 
           done(null, user);
         }, done);
