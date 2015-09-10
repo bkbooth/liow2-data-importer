@@ -26,7 +26,7 @@ module.exports = {
   transform: function __transform(users, mysql, mongodb, done) {
     async.waterfall([
       function(done) {
-        mongodb.collection('countries').find({}).toArray(done);
+        mongodb.collection('countries').find({}, { _id: true, code: true }).toArray(done);
       },
       function (countries, done) {
         async.map(users, function(user, done) {
