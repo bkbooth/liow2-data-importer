@@ -1,5 +1,7 @@
+var config = require('../config');
 var _ = require('lodash');
 var async = require('async');
+var toMarkdown = require('to-markdown');
 
 var name = 'deeds';
 
@@ -23,6 +25,7 @@ module.exports = {
     done(null, _.map(deeds, function __map(deed) {
       deed.url_title = _.kebabCase(deed.title);
       deed.video_url = _.last(/src="([^"]*)"/.exec(deed.video_url));
+      deed.content = toMarkdown(deed.content, { converters: config.markdownConverters });
       deed.created = new Date();
 
       return deed;
