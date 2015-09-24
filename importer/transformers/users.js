@@ -7,8 +7,9 @@ module.exports = {
   name: name,
 
   dataIn: function __dataIn(mysql, done) {
-    var query = 'SELECT DISTINCT u.email, u.name, u.created, c.code as country, m.name as groups, ' +
-      'IF(u.group_id = 1, TRUE, FALSE) AS admin, ' +
+    var query = 'SELECT DISTINCT u.email, u.name, u.group_id AS admin, u.created, u.modified, ' +
+      'c.code as country, m.name as groups, ' +
+      'IF(u.group_id = 1, TRUE, FALSE) AS superAdmin, ' +
       'IF(u.activated = 1, TRUE, FALSE) AS activated ' +
       'FROM `users` AS u ' +
       'RIGHT JOIN `testimonies` AS t ON t.user_id = u.id ' +
@@ -32,10 +33,14 @@ module.exports = {
       function (countries, done) {
         async.map(users, function(user, done) {
           user.username = user.name;
-          user.admin = Boolean(user.admin);
+          user.superAdmin = Boolean(user.superAdmin);
           user.activated = Boolean(user.activated);
           user.country = _.find(countries, 'code', user.country.toUpperCase())._id;
           user.groups = [user.groups];
+
+          if (user.created.valueOf() === user.modified.valueOf()) {
+            delete user.modified;
+          }
 
           done(null, user);
         }, done);

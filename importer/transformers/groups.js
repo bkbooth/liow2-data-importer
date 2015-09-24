@@ -36,9 +36,10 @@ module.exports = {
               if (err) { return done(err); }
 
               group.url_name = _.kebabCase(group.name);
-              group.owner = users[0]._id;
-              group.admins = [group.owner]; // TODO: get all admins?
               group.country = group.country ? _.find(countries, 'code', group.country.toUpperCase())._id : null;
+
+              group.admins = _.pluck(_.filter(users, function(user) { return user.admin < 4; }), '_id');
+              group.owner = group.admins[0];
 
               done(null, group);
             });
@@ -67,6 +68,25 @@ module.exports = {
           done(null, result);
         });
       }
-    ], done);
+    ], function(err, result) {
+      if (err) { return done(err); }
+
+      // After saving groups, need to update each users' group
+      mongodb.collection('users').find().toArray(function __toArray(err, users) {
+        if (err) { return done(err); }
+
+        async.each(users, function __each(user, done) {
+          var group = user.groups && user.groups[0] ? _.find(groups, 'name', user.groups[0]) : null;
+          user.groups = group ? [group._id] : [];
+
+          done(null, mongodb.collection('users').save(user));
+        }, function(err) {
+          if (err) { return done(err); }
+
+          console.log('Finished updating', users.length, 'user groups');
+          done(null, result);
+        });
+      });
+    });
   }
 };
