@@ -14,6 +14,33 @@ module.exports = {
 
   // Names of modules inside ./transformers directory
   // Must export dataIn, transform and dataOut functions
-  transformers: []
+  transformers: [
+    'countries',
+    'users',
+    'groups',
+    'deeds',
+    'testimonies',
+    'acts',
+    'news'
+  ],
+
+  // Extra converters to pass to toMarkdown
+  markdownConverters: [{
+    // Remove spans and divs with styling
+    filter: function (node) {
+      return (node.nodeName === 'SPAN' || node.nodeName === 'DIV') && node.style;
+    },
+    replacement: function (content) {
+      return content;
+    }
+  }, {
+    // Remove addthis sharing divs
+    filter: function (node) {
+      return node.nodeName === 'DIV' && /addthis/.test(node.className);
+    },
+    replacement: function () {
+      return '';
+    }
+  }]
 
 };
