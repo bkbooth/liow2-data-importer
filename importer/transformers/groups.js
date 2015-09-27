@@ -1,5 +1,7 @@
+var config = require('../config');
 var _ = require('lodash');
 var async = require('async');
+var toMarkdown = require('to-markdown');
 
 var name = 'groups';
 
@@ -7,7 +9,7 @@ module.exports = {
   name: name,
 
   dataIn: function __dataIn(mysql, done) {
-    var query = 'SELECT DISTINCT m.name, m.letter AS welcome_message, m.image AS logo, m.created, c.code as country ' +
+    var query = 'SELECT DISTINCT m.name, m.letter AS welcomeMessage, m.image AS logo, m.created, c.code as country ' +
       'FROM `ministries` AS m ' +
       'RIGHT JOIN `users` AS u ON u.ministry_id = m.id ' +
       'RIGHT JOIN `testimonies` AS t ON t.user_id = u.id ' +
@@ -35,8 +37,9 @@ module.exports = {
             .toArray(function __toArray(err, users) {
               if (err) { return done(err); }
 
-              group.url_name = _.kebabCase(group.name);
+              group.urlName = _.kebabCase(group.name.toLowerCase());
               group.country = group.country ? _.find(countries, 'code', group.country.toUpperCase())._id : null;
+              group.welcomeMessage = toMarkdown(group.welcomeMessage, { converters: config.markdownConverters });
 
               group.admins = _.pluck(_.filter(users, function(user) { return user.admin < 4; }), '_id');
               group.owner = group.admins[0];
@@ -78,6 +81,8 @@ module.exports = {
         async.each(users, function __each(user, done) {
           var group = user.groups && user.groups[0] ? _.find(groups, 'name', user.groups[0]) : null;
           user.groups = group ? [group._id] : [];
+
+          delete user.admin;
 
           done(null, mongodb.collection('users').save(user));
         }, function(err) {

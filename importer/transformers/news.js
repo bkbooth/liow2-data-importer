@@ -47,7 +47,7 @@ module.exports = {
         delete item.group;
         delete item.country;
 
-        item.url_title = _.kebabCase(item.title);
+        item.url_title = _.kebabCase(item.title.toLowerCase());
         item.author = group ? group.owner : null;
         item.content = {
           text: toMarkdown(item.content, { converters: config.markdownConverters })

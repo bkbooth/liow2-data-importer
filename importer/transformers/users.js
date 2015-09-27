@@ -32,7 +32,7 @@ module.exports = {
       },
       function (countries, done) {
         async.map(users, function(user, done) {
-          user.username = user.name;
+          user.username = user.email;
           user.superAdmin = Boolean(user.superAdmin);
           user.activated = Boolean(user.activated);
           user.country = _.find(countries, 'code', user.country.toUpperCase())._id;

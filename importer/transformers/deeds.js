@@ -9,7 +9,7 @@ module.exports = {
   name: name,
 
   dataIn: function __dataIn(mysql, done) {
-    var query = 'SELECT d.title, d.image AS cover_image, d.video AS video_url, t.content ' +
+    var query = 'SELECT d.title, d.image AS logo, d.video AS videoUrl, t.content ' +
       'FROM `deeds` AS d ' +
       'LEFT JOIN `translations` AS t ON t.deed_id = d.id AND t.language_id = 1 ' +
       'ORDER BY d.week';
@@ -23,8 +23,8 @@ module.exports = {
 
   transform: function __transform(deeds, mysql, mongodb, done) {
     done(null, _.map(deeds, function __map(deed) {
-      deed.url_title = _.kebabCase(deed.title);
-      deed.video_url = _.last(/src="([^"]*)"/.exec(deed.video_url));
+      deed.urlTitle = _.kebabCase(deed.title.toLowerCase());
+      deed.videoUrl = _.last(/src="([^"]*)"/.exec(deed.videoUrl));
       deed.content = toMarkdown(deed.content, { converters: config.markdownConverters });
       deed.created = new Date();
 
