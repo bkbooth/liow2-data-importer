@@ -7,15 +7,16 @@ module.exports = {
   name: name,
 
   dataIn: function __dataIn(mysql, done) {
-    var query = 'SELECT DISTINCT u.email, u.name, u.group_id AS admin, u.created, u.modified, ' +
+    var query = 'SELECT u.email, u.name, u.group_id AS admin, u.created, u.modified, ' +
       'c.code as country, m.name as groups, ' +
       'IF(u.group_id = 1, TRUE, FALSE) AS superAdmin, ' +
       'IF(u.activated = 1, TRUE, FALSE) AS activated ' +
       'FROM `users` AS u ' +
-      'RIGHT JOIN `testimonies` AS t ON t.user_id = u.id ' +
+      'INNER JOIN `testimonies` AS t ON t.user_id = u.id ' +
       'LEFT JOIN `countries` AS c ON u.country_id = c.id ' +
       'LEFT JOIN `ministries` AS m ON u.ministry_id = m.id ' +
       'WHERE u.activated = TRUE ' +
+      'GROUP BY u.id ' +
       'ORDER BY u.id';
 
     mysql.query(query, function __query(err, users) {
@@ -32,12 +33,16 @@ module.exports = {
       },
       function (countries, done) {
         async.map(users, function(user, done) {
-          user.username = user.email;
-          user.superAdmin = Boolean(user.superAdmin);
-          user.activated = Boolean(user.activated);
+          var names = user.name.split(' ');
+          if (names[0]) user.first_name = names[0];
+          if (names[1]) user.last_name = names[1];
+          delete user.name;
+
           user.country = _.find(countries, 'code', user.country.toUpperCase())._id;
           user.groups = [user.groups];
+          user.superAdmin = Boolean(user.superAdmin);
 
+          delete user.activated;
           if (user.created.valueOf() === user.modified.valueOf()) {
             delete user.modified;
           }

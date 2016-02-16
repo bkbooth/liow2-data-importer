@@ -16,9 +16,9 @@ module.exports = {
   // Must export dataIn, transform and dataOut functions
   transformers: [
     'countries',
+    'deeds',
     'users',
     'groups',
-    'deeds',
     'testimonies',
     'acts',
     'news'

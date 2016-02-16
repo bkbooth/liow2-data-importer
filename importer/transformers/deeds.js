@@ -23,7 +23,7 @@ module.exports = {
 
   transform: function __transform(deeds, mysql, mongodb, done) {
     done(null, _.map(deeds, function __map(deed) {
-      deed.urlTitle = _.kebabCase(deed.title.toLowerCase());
+      deed.urlTitle = _.kebabCase(deed.title);
       deed.videoUrl = _.last(/src="([^"]*)"/.exec(deed.videoUrl));
       deed.content = toMarkdown(deed.content, { converters: config.markdownConverters });
       deed.created = new Date();
