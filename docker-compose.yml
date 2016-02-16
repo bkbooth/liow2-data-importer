@@ -12,4 +12,5 @@ mongo:
     - "27017:27017"
   volumes:
     - /data/db:/data/db
+    - /data-out:/data-out
   command: --smallfiles
