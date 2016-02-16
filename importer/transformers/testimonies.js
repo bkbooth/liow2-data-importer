@@ -36,10 +36,10 @@ module.exports = {
       var deeds = results[1];
 
       done(null, _.filter(_.map(testimonies, function __map(testimony) {
-        var user = _.find(users, 'email', testimony.user);
+        var user = _.find(users, ['email', testimony.user]);
         testimony.user = user ? user._id : null;
 
-        var deed = _.find(deeds, 'title', testimony.deed);
+        var deed = _.find(deeds, ['title', testimony.deed]);
         testimony.target = { deed: deed ? deed._id : null };
         delete testimony.deed;
 

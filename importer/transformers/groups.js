@@ -31,6 +31,8 @@ module.exports = {
         mongodb.collection('countries').find({}, { _id: true, code: true }).toArray(done);
       },
       function(countries, done) {
+        groups = _.filter(groups, function __filter(group) { return group.name !== 'Global Campaign' });
+
         async.map(groups, function(group, done) {
           mongodb.collection('users')
             .find({ groups: group.name }, { _id: true, email: true, admin: true })
@@ -39,7 +41,7 @@ module.exports = {
               if (err) { return done(err); }
 
               group.urlName = _.kebabCase(group.name);
-              if (group.country) group.country = _.find(countries, 'code', group.country.toUpperCase())._id;
+              if (group.country) group.country = _.find(countries, ['code', group.country.toUpperCase()])._id;
               group.welcomeMessage = toMarkdown(group.welcomeMessage, { converters: config.markdownConverters });
 
               group.admins = _.map(_.filter(users, function(user) { return user.admin < 4; }), '_id');
@@ -82,7 +84,7 @@ module.exports = {
             if (err) { return done(err); }
 
             async.each(users, function __each(user, done) {
-              var group = user.groups && user.groups[0] ? _.find(groups, 'name', user.groups[0]) : null;
+              var group = user.groups && user.groups[0] ? _.find(groups, ['name', user.groups[0]]) : null;
               user.groups = group ? [group._id] : [];
 
               delete user.admin;

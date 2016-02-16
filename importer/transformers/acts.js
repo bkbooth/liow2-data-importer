@@ -23,23 +23,31 @@ module.exports = {
   transform: function __transform(acts, mysql, mongodb, done) {
     async.parallel([
       function(done) {
-        mongodb.collection('users').find({}, { _id: true, email: true }).toArray(done);
+        mongodb.collection('users').find({}, { _id: true, email: true, groups: true }).toArray(done);
       },
       function(done) {
         mongodb.collection('deeds').find({}, { _id: true, title: true }).toArray(done);
+      },
+      function(done) {
+        mongodb.collection('campaigns').find({}, { _id: true, group: true }).toArray(done);
       }
     ], function(err, results) {
       if (err) { return done(err); }
 
       var users = results[0];
       var deeds = results[1];
+      var campaigns = results[2];
 
       done(null, _.filter(_.map(acts, function __map(act) {
-        var user = _.find(users, 'email', act.user);
-        var deed = _.find(deeds, 'title', act.deed);
+        var user = _.find(users, ['email', act.user]);
+        var deed = _.find(deeds, ['title', act.deed]);
 
         act.user = user ? user._id : null;
         act.deed = deed ? deed._id : null;
+        if (user && user.groups[0]) {
+          act.group = user.groups[0];
+          act.campaign = _.find(campaigns, ['group', act.group])._id;
+        }
 
         return act;
       }), function __filter(act) {

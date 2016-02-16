@@ -34,11 +34,11 @@ module.exports = {
       function (countries, done) {
         async.map(users, function(user, done) {
           var names = user.name.split(' ');
-          if (names[0]) user.first_name = names[0];
-          if (names[1]) user.last_name = names[1];
+          if (names[0]) user.firstName = names[0];
+          if (names[1]) user.lastName = names[1];
           delete user.name;
 
-          user.country = _.find(countries, 'code', user.country.toUpperCase())._id;
+          user.country = _.find(countries, ['code', user.country.toUpperCase()])._id;
           user.groups = [user.groups];
           user.superAdmin = Boolean(user.superAdmin);
 

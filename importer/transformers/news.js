@@ -37,8 +37,8 @@ module.exports = {
       var countries = results[1];
 
       done(null, _.filter(_.map(news, function __map(item) {
-        var group = item.group ? _.find(groups, 'name', item.group) : null;
-        var country = item.country ? _.find(countries, 'code', item.country.toUpperCase()) : null;
+        var group = item.group ? _.find(groups, ['name', item.group]) : null;
+        var country = item.country ? _.find(countries, ['code', item.country.toUpperCase()]) : null;
 
         if (group) {
           item.target = { group: group._id };
