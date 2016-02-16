@@ -3,11 +3,13 @@ var _ = require('lodash');
 var async = require('async');
 var toMarkdown = require('to-markdown');
 
+var name = 'news';
+
 module.exports = {
-  name: 'news',
+  name: name,
 
   dataIn: function __dataIn(mysql, done) {
-    var query = 'SELECT n.title, n.content, n.created, n.modified, m.name AS \'group\', c.code AS country ' +
+    var query = 'SELECT n.content, n.created, n.modified, m.name AS \'group\', c.code AS country ' +
       'FROM `news` AS n ' +
       'LEFT JOIN `ministries` AS m ON n.ministry_id = m.id ' +
       'LEFT JOIN `countries` AS c ON n.country_id = c.id ' +
@@ -47,8 +49,7 @@ module.exports = {
         delete item.group;
         delete item.country;
 
-        item.url_title = _.kebabCase(item.title.toLowerCase());
-        item.author = group ? group.owner : null;
+        item.user = group ? group.owner : null;
         item.content = {
           text: toMarkdown(item.content, { converters: config.markdownConverters })
         };
@@ -59,7 +60,7 @@ module.exports = {
 
         return item;
       }), function __filter(item) {
-        return item.target;
+        return item.target && item.user !== null;
       }));
     });
   },
