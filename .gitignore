@@ -1,3 +1,4 @@
 config.js
 mysql/*.sql
 npm-debug.log
+node_modules

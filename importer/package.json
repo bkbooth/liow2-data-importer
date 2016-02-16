@@ -10,10 +10,10 @@
   "author": "Ben Booth <bkbooth@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "async": "^1.4.2",
-    "lodash": "^3.10.1",
-    "mongodb": "^2.0.42",
-    "mysql": "^2.9.0",
-    "to-markdown": "^2.0.0"
+    "async": "^1.5.2",
+    "lodash": "^4.4.0",
+    "mongodb": "^2.1.7",
+    "mysql": "^2.10.2",
+    "to-markdown": "^2.0.1"
   }
 }

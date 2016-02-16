@@ -41,7 +41,7 @@ module.exports = {
               group.country = group.country ? _.find(countries, 'code', group.country.toUpperCase())._id : null;
               group.welcomeMessage = toMarkdown(group.welcomeMessage, { converters: config.markdownConverters });
 
-              group.admins = _.pluck(_.filter(users, function(user) { return user.admin < 4; }), '_id');
+              group.admins = _.map(_.filter(users, function(user) { return user.admin < 4; }), '_id');
               group.owner = group.admins[0];
 
               done(null, group);
