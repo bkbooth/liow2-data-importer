@@ -12,7 +12,7 @@
   "dependencies": {
     "async": "^1.5.2",
     "lodash": "^4.4.0",
-    "mongodb": "^2.1.7",
+    "mongodb": "^3.6.1",
     "mysql": "^2.10.2",
     "to-markdown": "^2.0.1"
   }
